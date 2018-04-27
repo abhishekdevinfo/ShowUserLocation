@@ -3,6 +3,8 @@ package com.example.abhishek.showuserlocation;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -12,6 +14,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -19,6 +22,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -59,6 +66,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onLocationChanged(Location location) {
 
+                /*
+                * Address[addressLines=[0:"Shindi, Maharashtra 445101, India"],feature=Shindi,admin=Maharashtra,sub-admin=Wardha,locality=Shindi,thoroughfare=null,postalCode=445101,countryCode=IN,countryName=India,hasLatitude=true,latitude=20.66117,hasLongitude=true,longitude=78.2219806,phone=null,url=null,extras=null]
+
+                 * */
+
                 mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 
                 // Add a marker in Sydney and move the camera
@@ -67,6 +79,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.addMarker(new MarkerOptions().position(yourLocation).title("Your Location"));
 
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(yourLocation, 10));
+
+                // Getting Info about Location
+
+                Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+
+                try {
+
+                    List<Address> listAddresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+
+                    if (listAddresses != null && listAddresses.size() > 0) {
+
+                        Toast.makeText(MapsActivity.this, "Your Current Location is: " + listAddresses.get(0).getAddressLine(0), Toast.LENGTH_SHORT).show();
+
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
 
             }
 
